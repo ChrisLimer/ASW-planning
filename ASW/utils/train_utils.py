@@ -385,11 +385,6 @@ def filter_jax_dict(d):
 
 # def log_metrics(writer, i, config, args, time_, metric_trajectory, metric_losses, metric_kl, metric_entropy, metric_clip_norm_ratio):
 def log_metrics(writer, i, config, args, time_, metric_outcome, metric_policy, metric_losses, metric_clip_norm_ratio):
-    # (R_tTi_0_mean, R_tT_, R_tTi_, Pd_tT_, Pd_tTi_, Ps_tT_, Ps_tTi_, Ps_vec_tT_) = metrics   ## These arrays have shape (config['N_JIT_STEPS'],), but Ps_vec_tT_ have (config['N_JIT_STEPS'], 2)
-    # (R_tT_, R_tTi_, Pd_tT_, Pd_tTi_, Ps_tT_, Ps_tTi_, Ps_vec_tT_, R_tT_std, Ps_tT_std, Pd_tT_std) = metric_outcome   # (Njs). Ps_vec_tT_: (Njs, 2)
-    # (training_loss, loss_v, loss_vi, loss_actor_sub, loss_actor_sv, global_grad_norm) = metric_policy                   # (Njs, E, MbN)
-    # (sub_i_entropy_loss_mean, sub_i_entropy_loss_max, sv_entropy_loss_mean, sv_entropy_loss_max) = metric_losses       # (Njs, E, MbN)
-    # (loss_kl_sub_i, loss_kl_sv, KL_dist_sub_i_max, KL_dist_sv_max, KL_dist_sub_i_mean, KL_dist_sv_mean) = metric_clip_norm_ratio     # (Njs, E, MbN)
     (R_vec, R_i_vec, Ps_vec, Pd_vec, Ps1_vec, Ps2_vec, R_tT_std, Ps_tT_std, Pd_tT_std) = metric_outcome   # (Njs). Ps_vec_tT_: (Njs, 2)
     (sv_KL_distance_vec, sub_KL_distance_vec, sub_entropy_vec, sv_entropy_vec) = metric_policy                   # (Njs, E, MbN)
     (training_loss, loss_v, loss_vi, loss_actor_sub, loss_actor_sv, loss_kl_sub_i, loss_kl_sv, sv_entropy_loss, sub_entropy_loss) = metric_losses       # (Njs, E, MbN)
@@ -401,40 +396,6 @@ def log_metrics(writer, i, config, args, time_, metric_outcome, metric_policy, m
                                     global_grad_norm_mean,
                                     jnp.mean(global_grad_norm, where=global_grad_norm>=global_grad_norm_mean),
                                     jnp.max(global_grad_norm, initial=-1e+10)])
-    
-    # print(f"    R_vec: {R_vec.shape}")
-    # print(f"    R_i_vec: {R_i_vec.shape}")
-    # print(f"    Ps_vec: {Ps_vec.shape}")
-    # print(f"    Pd_vec: {Pd_vec.shape}")
-    # print(f"    Ps1_vec: {Ps1_vec.shape}")
-    # print(f"    Ps2_vec: {Ps2_vec.shape}")
-    # print(f"    R_tT_std: {R_tT_std.shape}")
-    # print(f"    Ps_tT_std: {Ps_tT_std.shape}")
-    # print(f"    Pd_tT_std: {Pd_tT_std.shape}")
-
-    # print(f"    sv_KL_distance_vec: {sv_KL_distance_vec.shape}")
-    # print(f"    sub_KL_distance_vec: {sub_KL_distance_vec.shape}")
-    # print(f"    sub_entropy_vec: {sub_entropy_vec.shape}")
-    # print(f"    sv_entropy_vec: {sv_entropy_vec.shape}")
-
-    # print(f"    training_loss: {training_loss.shape}")
-    # print(f"    loss_v: {loss_v.shape}")
-    # print(f"    loss_vi: {loss_vi.shape}")
-    # print(f"    loss_actor_sub: {loss_actor_sub.shape}")
-    # print(f"    loss_actor_sv: {loss_actor_sv.shape}")
-    # print(f"    loss_kl_sub_i: {loss_kl_sub_i.shape}")
-    # print(f"    loss_kl_sv: {loss_kl_sv.shape}")
-    # print(f"    sv_entropy_loss: {sv_entropy_loss.shape}")
-    # print(f"    sub_entropy_loss: {sub_entropy_loss.shape}")
-
-    # print(f"    global_grad_norm: {global_grad_norm.shape}")
-    # print(f"    sub_ratio_dist: {sub_ratio_dist.shape}")
-    # print(f"    sv_ratio_dist: {sv_ratio_dist.shape}")
-    # print(f"    sv_ratio_clip_rate: {sv_ratio_clip_rate.shape}")
-    # print(f"    sub_ratio_clip_rate: {sub_ratio_clip_rate.shape}")
-    # print(f"    sv_Adv_vec: {sv_Adv_vec.shape}")
-    # print(f"    sub_Adv_vec: {sub_Adv_vec.shape}")
-
 
     writer.add_scalars(main_tag="Trajectory outcomes/R_tT",
         tag_scalar_dict={
@@ -450,7 +411,7 @@ def log_metrics(writer, i, config, args, time_, metric_outcome, metric_policy, m
             "mean(R_i_vec<mean) ":  jnp.mean(R_i_vec[:,1]) ,
             "mean(R_i_vec) ":  jnp.mean(R_i_vec[:,2]) ,
             "mean(R_i_vec>=mean) ":  jnp.mean(R_i_vec[:,3]) ,
-            "max(R_i_vec) ":  jnp.mean(R_i_vec[:,4]) ,
+            "max(R_i_vec) ":  jnp.mean(Ps_vec_tT_R_i_vec[:,4]) ,
         }, global_step=i)
     writer.add_scalars(main_tag="Trajectory outcomes/Ps",
         tag_scalar_dict={
@@ -490,6 +451,17 @@ def log_metrics(writer, i, config, args, time_, metric_outcome, metric_policy, m
             "R_tT_std":  jnp.sqrt( jnp.mean(R_tT_std*R_tT_std, axis=0) ),
             "Ps_tT_std": jnp.sqrt( jnp.mean(Ps_tT_std*Ps_tT_std, axis=0) ),
             "Pd_tT_std": jnp.sqrt( jnp.mean(Pd_tT_std*Pd_tT_std, axis=0) ),
+        }, global_step=i)
+    writer.add_scalars(main_tag="Trajectory outcomes/Ps_vec_tT_",
+        tag_scalar_dict={
+            "Ps_1": jnp.mean(jnp.mean(Ps1_vec[:,2])),    ## probability that the sub reaches the left objective
+            "Ps_2": jnp.mean(jnp.mean(Ps2_vec[:,2])),    ## probability that the sub reaches the right objective
+        }, global_step=i)
+    writer.add_scalars(main_tag="Trajectory outcomes/(Pd,Ps,P0)",
+        tag_scalar_dict={
+            "Pd": jnp.mean(jnp.mean(Pd_vec[:,2])),
+            "Ps": jnp.mean(jnp.mean(Ps_vec[:,2])),
+            "P0": jnp.mean(1.0-(jnp.mean(Ps_vec[:,2])+jnp.mean(Pd_vec[:,2]))),
         }, global_step=i)
     
 
@@ -594,115 +566,3 @@ def log_metrics(writer, i, config, args, time_, metric_outcome, metric_policy, m
     
 
     return
-
-    # (global_grad_norm, ratio_sv_clip_rate, ratio_sub_clip_rate, sv_ratio_max, sv_ratio_min, sv_ratio_high, sv_ratio_low, sub_ratio_samples_max, sub_ratio_samples_min, sub_ratio_samples_high, sub_ratio_samples_low) = metric_clip_norm_ratio
-    # metric_trajectory, metric_losses, metric_entropy, metric_kl
-
-    writer.add_scalars( main_tag="Trajectory outcomes/RrT_", tag_scalar_dict={"RrT_": jnp.mean(R_tT_, axis=0) }, global_step=i)
-    writer.add_scalars( main_tag="Trajectory outcomes/RrTi_", tag_scalar_dict={"RrTi_": jnp.mean(R_tTi_, axis=0)}, global_step=i)
-    writer.add_scalars(main_tag="Trajectory outcomes/R_tT_std",
-        tag_scalar_dict={
-            "R_tT_std":  jnp.sqrt( jnp.mean(R_tT_std*R_tT_std, axis=0) ),
-            "Ps_tT_std": jnp.sqrt( jnp.mean(Ps_tT_std*Ps_tT_std, axis=0) ),
-            "Pd_tT_std": jnp.sqrt( jnp.mean(Pd_tT_std*Pd_tT_std, axis=0) ),
-        }, global_step=i)
-    writer.add_scalars(main_tag="Trajectory outcomes/(Pd,Ps)",
-        tag_scalar_dict={
-            "Pd": jnp.mean(Pd_tT_, axis=0),
-            "Ps": jnp.mean(Ps_tT_, axis=0),
-            "P0": jnp.mean(1.0-(Ps_tT_+Pd_tT_)),
-        }, global_step=i)
-    writer.add_scalars(main_tag="Trajectory outcomes/(Pd_i,Ps_i)",
-        tag_scalar_dict={
-            "Pd_i": jnp.mean(Pd_tTi_),
-            "Ps_i": jnp.mean(Ps_tTi_),
-            "P0_i": jnp.mean(1.0-(Ps_tTi_+Pd_tTi_)), }, global_step=i)
-    writer.add_scalars(main_tag="Trajectory outcomes/Ps_vec_tT_",
-        tag_scalar_dict={
-            "Ps_1": jnp.mean(Ps_vec_tT_, axis=0)[0],    ## probability that the sub reaches the left objective
-            "Ps_2": jnp.mean(Ps_vec_tT_, axis=0)[1],    ## probability that the sub reaches the right objective
-        }, global_step=i)
-    
-    writer.add_scalars(main_tag="Policy-Entropy/Sub",
-        tag_scalar_dict={
-            "max": jnp.max(sub_i_entropy_loss_max),             # Max policy entropy for submarine policy
-            "mean": jnp.mean(sub_i_entropy_loss_mean),  # Mean policy entropy for submarine policy
-        }, global_step=i)
-    writer.add_scalars(main_tag="Policy-Entropy/SV",
-        tag_scalar_dict={
-            "max": jnp.max(sv_entropy_loss_max),             # Max policy entropy for SV policy
-            "mean": jnp.mean(sv_entropy_loss_mean),  # Mean policy entropy for SV policy
-        }, global_step=i)
-    
-    writer.add_scalars(main_tag="KL-Distance/Sub",
-        tag_scalar_dict={
-            "max": jnp.max(KL_dist_sub_i_max),             # Max KL-distance for submarine policy
-            "mean": jnp.mean(KL_dist_sub_i_mean),  # Mean KL-distance for submarine policy
-        }, global_step=i)
-    writer.add_scalars(main_tag="KL-Distance/SV",
-        tag_scalar_dict={
-            "max": jnp.max(KL_dist_sv_max),             # Max KL-distance for SV policy
-            "mean": jnp.mean(KL_dist_sv_mean),  # Mean KL-distance for SV policy
-        }, global_step=i)
-    
-    
-    writer.add_scalar("Clipping, Norms and Ratios/global_grad_norm", jnp.mean(global_grad_norm), global_step=i)
-    # writer.add_scalar("Clipping, Norms and Ratios/ratio_clip_rate SV", jnp.mean(ratio_sv_clip_rate), global_step=i)
-    # writer.add_scalar("Clipping, Norms and Ratios/ratio_clip_rate Sub", jnp.mean(ratio_sub_clip_rate), global_step=i)
-    # writer.add_scalar("Clipping, Norms and Ratios/Max ratio SV", jnp.mean(sv_ratio_max), global_step=i)
-    # writer.add_scalar("Clipping, Norms and Ratios/Max ratio Sub", jnp.mean(sub_ratio_samples_max), global_step=i)
-    writer.add_scalars(main_tag="Clipping, Norms and Ratios/Policy-ratio clip-rate",
-        tag_scalar_dict={
-            "SV": jnp.mean(ratio_sv_clip_rate),
-            "Sub": jnp.mean(ratio_sub_clip_rate),
-        }, global_step=i)
-    writer.add_scalars(main_tag="Clipping, Norms and Ratios/Policy ratio Sub",
-        tag_scalar_dict={
-            "Max": jnp.max(sub_ratio_samples_max),
-            "Min": jnp.min(sub_ratio_samples_min),
-            "Mean high": jnp.mean(sub_ratio_samples_high),
-            "Mean low": jnp.mean(sub_ratio_samples_low),
-        }, global_step=i)
-    writer.add_scalars(main_tag="Clipping, Norms and Ratios/Policy ratio SV",
-        tag_scalar_dict={
-            "Max": jnp.max(sv_ratio_max),
-            "Min": jnp.min(sv_ratio_min),
-            "Mean high": jnp.mean(sv_ratio_high),
-            "Mean low": jnp.mean(sv_ratio_low), 
-        }, global_step=i)
-    # writer.add_scalars(main_tag="Clipping, Norms and Ratios/Absolute advantage",
-    #     tag_scalar_dict={
-    #         "Max SV": jnp.mean(ratio_sv_clip_rate),
-    #         "Max Sub": jnp.mean(ratio_sub_clip_rate),
-    #         "Mean SV": jnp.mean(ratio_sv_clip_rate),
-    #         "Mean Sub": jnp.mean(ratio_sub_clip_rate),
-    #     }, global_step=i)
-
-
-    writer.add_scalar("losses/training loss", jnp.mean(training_loss), global_step=i)
-    writer.add_scalar("losses/value-i loss", jnp.mean(loss_vi), global_step=i)
-    writer.add_scalar("losses/value loss", jnp.mean(loss_v), global_step=i)
-
-    writer.add_scalars(main_tag="losses/policy-loss",
-        tag_scalar_dict={
-            "loss_policy_sub": jnp.mean(loss_actor_sub),         # Mean sub policy loss
-            "loss_policy_sv": jnp.mean(loss_actor_sv),           # Mean SV policy loss
-        }, global_step=i)
-
-    writer.add_scalar("Training scheme/c", config['c'], global_step=i)
-    # time_end = time.time()
-    # writer.add_scalar("Training scheme/update-dt", (time_end-time_training_start), global_step=i)
-    writer.add_scalar("Training scheme/update-dt", (time_), global_step=i)
-
-    if args.resume:
-        writer.add_scalars(main_tag="Trajectory outcomes/resumed/RrT_", tag_scalar_dict={"RrT_": jnp.mean(R_tT_, axis=0)}, global_step=i)
-        writer.add_scalars(main_tag="Trajectory outcomes/resumed/(Pd,Ps)",
-            tag_scalar_dict={
-                "Pd": jnp.mean(Pd_tT_),
-                "Ps": jnp.mean(Ps_tT_),
-                "P0": jnp.mean(1.0-(Ps_tT_+Pd_tT_)), }, global_step=i)
-        writer.add_scalars(main_tag="Trajectory outcomes/resumed/Ps_vec_tT_",
-            tag_scalar_dict={
-                "Ps_1": jnp.mean(Ps_vec_tT_, axis=0)[0],    ## probability that the sub reaches the left objective
-                "Ps_2": jnp.mean(Ps_vec_tT_, axis=0)[1],    ## probability that the sub reaches the right objective
-            }, global_step=i)
