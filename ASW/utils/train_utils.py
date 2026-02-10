@@ -411,7 +411,7 @@ def log_metrics(writer, i, config, args, time_, metric_outcome, metric_policy, m
             "mean(R_i_vec<mean) ":  jnp.mean(R_i_vec[:,1]) ,
             "mean(R_i_vec) ":  jnp.mean(R_i_vec[:,2]) ,
             "mean(R_i_vec>=mean) ":  jnp.mean(R_i_vec[:,3]) ,
-            "max(R_i_vec) ":  jnp.mean(Ps_vec_tT_R_i_vec[:,4]) ,
+            "max(R_i_vec) ":  jnp.mean(R_i_vec[:,4]) ,
         }, global_step=i)
     writer.add_scalars(main_tag="Trajectory outcomes/Ps",
         tag_scalar_dict={
