@@ -23,7 +23,7 @@ The UV is assumed to know the position and activity of all active sonars in real
 
 The goal is to generate search paths that approximate a Nash equilibrium: unpredictable even to an adversary who knows the strategy.
 
-![Hexagonal Search Grid](figures/Board2.png)  
+![Hexagonal Search Grid](figures/Board.png)  
 *Illustration: Discretized nautical chart with axial coordinates (q,r). Land (masked) and water hexagons define the operational area. Critical assets are marked as flags.*
 
 ## Key Innovation
