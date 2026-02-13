@@ -1,1 +1,4 @@
 *.png filter=lfs diff=lfs merge=lfs -text
+
+# Don't apply LFS to vendored OpenSpiel subtree
+ASW_toy/open_spiel/** -filter -diff -merge -text
