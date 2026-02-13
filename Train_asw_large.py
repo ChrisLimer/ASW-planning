@@ -43,7 +43,7 @@ np.set_printoptions(
 
 ## Example Run training
 # uv run Train_asw_large.py --save_path "./ASW/checkpoints/train_2026_02_09/" --N 32 --n 1024 --lr 0.0001 --N_train_steps 16385 --N_JIT_STEPS 16 --alpha_kl 0.001 --gamma_averaging 0.001 --reg_freq 32 --cpt_freq 32 --sv_ent_loss 0.001 --sub_ent_loss 0.001 --a 1.0 --b 1.0 --c 0.008 --r 5 --SL_loss 40 --RL_loss 40 --SL 130 --max_grad_norm 1.0 --clip_eps 0.2 --num_minibatches 4 --num_epochs 4
-
+# uv run Train_asw_large.py --save_path "./ASW/checkpoints/train_2026_02_10_3/" --N 128 --n 1024 --lr 0.0001 --N_train_steps 16385 --N_JIT_STEPS 16 --alpha_kl 0.001 --gamma_averaging 0.001 --reg_freq 32 --cpt_freq 32 --sv_ent_loss 0.001 --sub_ent_loss 0.001 --a 1.0 --b 1.0 --c 0.008 --r 5 --SL_loss 40 --RL_loss 40 --SL 130 --max_grad_norm 1.0 --clip_eps 0.2 --num_minibatches 4 --num_epochs 1
 
 def InterpolateConfigs(config_i, config1, config2, i_step, keys, N_train_steps):
     config_i_ = config_i.copy().unfreeze()

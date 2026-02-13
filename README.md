@@ -24,14 +24,17 @@ The UV is assumed to know the position and activity of all active sonars in real
 The goal is to generate search paths that approximate a Nash equilibrium: unpredictable even to an adversary who knows the strategy.
 
 ![Hexagonal Search Grid](figures/Board.png)  
-*Illustration: Discretized nautical chart with axial coordinates (q,r). Land (masked) and water hexagons define the operational area. Critical assets are marked as flags.*
+*Illustration: Discretized nautical chart with axial coordinates (q,r). Water hexagons define the operational area and land are highlighted with a white boundary. Critical assets are marked as flags.*
 
 ## Key Innovation
 
-Unlike prior game-theoretic patrolling systems (e.g., PROTECT, PAWS) that assume passive sensors, this approach explicitly models *active sonars* — whose emissions reveal the defender’s position — making the problem far more dynamic and realistic. The solution transforms the imperfect-information ASW game into a perfect-information public belief game, solvable via self-play and regularization.
+Unlike prior game-theoretic patrolling systems (e.g., PROTECT, PAWS) that assume passive sensors, this approach explicitly models *active sonars* — whose emissions reveal the defender’s position — making the problem far more dynamic and realistic.
 
 The code implements this method in JAX, enabling high-throughput GPU-accelerated training and real-time strategy generation.
 
 
-[comment]: <# Index>
+# Index
+
+*   [Setup the virtual environment](docs/venv.md)
+*   []
 
