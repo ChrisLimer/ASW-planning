@@ -1,0 +1,942 @@
+{
+    "turn: 1  pl: 0 Sub: 1  SV:  Detected: 0": {
+        "Det": false,
+        "SV": [],
+        "Sub": [
+            1
+        ],
+        "pl": 0,
+        "turn": 1
+    },
+    "turn: 1  pl: 0 Sub: 2  SV:  Detected: 0": {
+        "Det": false,
+        "SV": [],
+        "Sub": [
+            2
+        ],
+        "pl": 0,
+        "turn": 1
+    },
+    "turn: 2  pl: 1 Sub:  SV:  Detected: 0": {
+        "Det": false,
+        "SV": [],
+        "Sub": [],
+        "pl": 1,
+        "turn": 2
+    },
+    "turn: 3  pl: 0 Sub: 1 3  SV: 4  Detected: 0": {
+        "Det": false,
+        "SV": [
+            4
+        ],
+        "Sub": [
+            1,
+            3
+        ],
+        "pl": 0,
+        "turn": 3
+    },
+    "turn: 3  pl: 0 Sub: 1 3  SV: 5  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5
+        ],
+        "Sub": [
+            1,
+            3
+        ],
+        "pl": 0,
+        "turn": 3
+    },
+    "turn: 3  pl: 0 Sub: 1 4  SV: 3  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3
+        ],
+        "Sub": [
+            1,
+            4
+        ],
+        "pl": 0,
+        "turn": 3
+    },
+    "turn: 3  pl: 0 Sub: 1 4  SV: 5  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5
+        ],
+        "Sub": [
+            1,
+            4
+        ],
+        "pl": 0,
+        "turn": 3
+    },
+    "turn: 3  pl: 0 Sub: 2 4  SV: 3  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3
+        ],
+        "Sub": [
+            2,
+            4
+        ],
+        "pl": 0,
+        "turn": 3
+    },
+    "turn: 3  pl: 0 Sub: 2 4  SV: 5  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5
+        ],
+        "Sub": [
+            2,
+            4
+        ],
+        "pl": 0,
+        "turn": 3
+    },
+    "turn: 3  pl: 0 Sub: 2 5  SV: 3  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3
+        ],
+        "Sub": [
+            2,
+            5
+        ],
+        "pl": 0,
+        "turn": 3
+    },
+    "turn: 3  pl: 0 Sub: 2 5  SV: 4  Detected: 0": {
+        "Det": false,
+        "SV": [
+            4
+        ],
+        "Sub": [
+            2,
+            5
+        ],
+        "pl": 0,
+        "turn": 3
+    },
+    "turn: 4  pl: 1 Sub:  SV: 3  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3
+        ],
+        "Sub": [],
+        "pl": 1,
+        "turn": 4
+    },
+    "turn: 4  pl: 1 Sub:  SV: 4  Detected: 0": {
+        "Det": false,
+        "SV": [
+            4
+        ],
+        "Sub": [],
+        "pl": 1,
+        "turn": 4
+    },
+    "turn: 4  pl: 1 Sub:  SV: 5  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5
+        ],
+        "Sub": [],
+        "pl": 1,
+        "turn": 4
+    },
+    "turn: 5  pl: 0 Sub: 1 3 6  SV: 4 7  Detected: 0": {
+        "Det": false,
+        "SV": [
+            4,
+            7
+        ],
+        "Sub": [
+            1,
+            3,
+            6
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 3 6  SV: 4 8  Detected: 0": {
+        "Det": false,
+        "SV": [
+            4,
+            8
+        ],
+        "Sub": [
+            1,
+            3,
+            6
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 3 6  SV: 4 9  Detected: 0": {
+        "Det": false,
+        "SV": [
+            4,
+            9
+        ],
+        "Sub": [
+            1,
+            3,
+            6
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 3 6  SV: 5 7  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            7
+        ],
+        "Sub": [
+            1,
+            3,
+            6
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 3 6  SV: 5 8  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            8
+        ],
+        "Sub": [
+            1,
+            3,
+            6
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 3 6  SV: 5 9  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            9
+        ],
+        "Sub": [
+            1,
+            3,
+            6
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 3 7  SV: 4 6  Detected: 0": {
+        "Det": false,
+        "SV": [
+            4,
+            6
+        ],
+        "Sub": [
+            1,
+            3,
+            7
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 3 7  SV: 4 8  Detected: 0": {
+        "Det": false,
+        "SV": [
+            4,
+            8
+        ],
+        "Sub": [
+            1,
+            3,
+            7
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 3 7  SV: 4 9  Detected: 0": {
+        "Det": false,
+        "SV": [
+            4,
+            9
+        ],
+        "Sub": [
+            1,
+            3,
+            7
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 3 7  SV: 5 6  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            6
+        ],
+        "Sub": [
+            1,
+            3,
+            7
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 3 7  SV: 5 8  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            8
+        ],
+        "Sub": [
+            1,
+            3,
+            7
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 3 7  SV: 5 9  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            9
+        ],
+        "Sub": [
+            1,
+            3,
+            7
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 4 7  SV: 3 6  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            6
+        ],
+        "Sub": [
+            1,
+            4,
+            7
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 4 7  SV: 3 8  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            8
+        ],
+        "Sub": [
+            1,
+            4,
+            7
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 4 7  SV: 3 9  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            9
+        ],
+        "Sub": [
+            1,
+            4,
+            7
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 4 7  SV: 5 6  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            6
+        ],
+        "Sub": [
+            1,
+            4,
+            7
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 4 7  SV: 5 8  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            8
+        ],
+        "Sub": [
+            1,
+            4,
+            7
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 4 7  SV: 5 9  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            9
+        ],
+        "Sub": [
+            1,
+            4,
+            7
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 4 8  SV: 3 6  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            6
+        ],
+        "Sub": [
+            1,
+            4,
+            8
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 4 8  SV: 3 7  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            7
+        ],
+        "Sub": [
+            1,
+            4,
+            8
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 4 8  SV: 3 9  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            9
+        ],
+        "Sub": [
+            1,
+            4,
+            8
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 4 8  SV: 5 6  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            6
+        ],
+        "Sub": [
+            1,
+            4,
+            8
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 4 8  SV: 5 7  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            7
+        ],
+        "Sub": [
+            1,
+            4,
+            8
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 1 4 8  SV: 5 9  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            9
+        ],
+        "Sub": [
+            1,
+            4,
+            8
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 4 7  SV: 3 6  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            6
+        ],
+        "Sub": [
+            2,
+            4,
+            7
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 4 7  SV: 3 8  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            8
+        ],
+        "Sub": [
+            2,
+            4,
+            7
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 4 7  SV: 3 9  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            9
+        ],
+        "Sub": [
+            2,
+            4,
+            7
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 4 7  SV: 5 6  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            6
+        ],
+        "Sub": [
+            2,
+            4,
+            7
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 4 7  SV: 5 8  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            8
+        ],
+        "Sub": [
+            2,
+            4,
+            7
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 4 7  SV: 5 9  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            9
+        ],
+        "Sub": [
+            2,
+            4,
+            7
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 4 8  SV: 3 6  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            6
+        ],
+        "Sub": [
+            2,
+            4,
+            8
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 4 8  SV: 3 7  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            7
+        ],
+        "Sub": [
+            2,
+            4,
+            8
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 4 8  SV: 3 9  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            9
+        ],
+        "Sub": [
+            2,
+            4,
+            8
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 4 8  SV: 5 6  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            6
+        ],
+        "Sub": [
+            2,
+            4,
+            8
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 4 8  SV: 5 7  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            7
+        ],
+        "Sub": [
+            2,
+            4,
+            8
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 4 8  SV: 5 9  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            9
+        ],
+        "Sub": [
+            2,
+            4,
+            8
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 5 8  SV: 3 6  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            6
+        ],
+        "Sub": [
+            2,
+            5,
+            8
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 5 8  SV: 3 7  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            7
+        ],
+        "Sub": [
+            2,
+            5,
+            8
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 5 8  SV: 3 9  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            9
+        ],
+        "Sub": [
+            2,
+            5,
+            8
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 5 8  SV: 4 6  Detected: 0": {
+        "Det": false,
+        "SV": [
+            4,
+            6
+        ],
+        "Sub": [
+            2,
+            5,
+            8
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 5 8  SV: 4 7  Detected: 0": {
+        "Det": false,
+        "SV": [
+            4,
+            7
+        ],
+        "Sub": [
+            2,
+            5,
+            8
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 5 8  SV: 4 9  Detected: 0": {
+        "Det": false,
+        "SV": [
+            4,
+            9
+        ],
+        "Sub": [
+            2,
+            5,
+            8
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 5 9  SV: 3 6  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            6
+        ],
+        "Sub": [
+            2,
+            5,
+            9
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 5 9  SV: 3 7  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            7
+        ],
+        "Sub": [
+            2,
+            5,
+            9
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 5 9  SV: 3 8  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            8
+        ],
+        "Sub": [
+            2,
+            5,
+            9
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 5 9  SV: 4 6  Detected: 0": {
+        "Det": false,
+        "SV": [
+            4,
+            6
+        ],
+        "Sub": [
+            2,
+            5,
+            9
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 5 9  SV: 4 7  Detected: 0": {
+        "Det": false,
+        "SV": [
+            4,
+            7
+        ],
+        "Sub": [
+            2,
+            5,
+            9
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 5  pl: 0 Sub: 2 5 9  SV: 4 8  Detected: 0": {
+        "Det": false,
+        "SV": [
+            4,
+            8
+        ],
+        "Sub": [
+            2,
+            5,
+            9
+        ],
+        "pl": 0,
+        "turn": 5
+    },
+    "turn: 6  pl: 1 Sub:  SV: 3 6  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            6
+        ],
+        "Sub": [],
+        "pl": 1,
+        "turn": 6
+    },
+    "turn: 6  pl: 1 Sub:  SV: 3 7  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            7
+        ],
+        "Sub": [],
+        "pl": 1,
+        "turn": 6
+    },
+    "turn: 6  pl: 1 Sub:  SV: 3 8  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            8
+        ],
+        "Sub": [],
+        "pl": 1,
+        "turn": 6
+    },
+    "turn: 6  pl: 1 Sub:  SV: 3 9  Detected: 0": {
+        "Det": false,
+        "SV": [
+            3,
+            9
+        ],
+        "Sub": [],
+        "pl": 1,
+        "turn": 6
+    },
+    "turn: 6  pl: 1 Sub:  SV: 4 6  Detected: 0": {
+        "Det": false,
+        "SV": [
+            4,
+            6
+        ],
+        "Sub": [],
+        "pl": 1,
+        "turn": 6
+    },
+    "turn: 6  pl: 1 Sub:  SV: 4 7  Detected: 0": {
+        "Det": false,
+        "SV": [
+            4,
+            7
+        ],
+        "Sub": [],
+        "pl": 1,
+        "turn": 6
+    },
+    "turn: 6  pl: 1 Sub:  SV: 4 8  Detected: 0": {
+        "Det": false,
+        "SV": [
+            4,
+            8
+        ],
+        "Sub": [],
+        "pl": 1,
+        "turn": 6
+    },
+    "turn: 6  pl: 1 Sub:  SV: 4 9  Detected: 0": {
+        "Det": false,
+        "SV": [
+            4,
+            9
+        ],
+        "Sub": [],
+        "pl": 1,
+        "turn": 6
+    },
+    "turn: 6  pl: 1 Sub:  SV: 5 6  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            6
+        ],
+        "Sub": [],
+        "pl": 1,
+        "turn": 6
+    },
+    "turn: 6  pl: 1 Sub:  SV: 5 7  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            7
+        ],
+        "Sub": [],
+        "pl": 1,
+        "turn": 6
+    },
+    "turn: 6  pl: 1 Sub:  SV: 5 8  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            8
+        ],
+        "Sub": [],
+        "pl": 1,
+        "turn": 6
+    },
+    "turn: 6  pl: 1 Sub:  SV: 5 9  Detected: 0": {
+        "Det": false,
+        "SV": [
+            5,
+            9
+        ],
+        "Sub": [],
+        "pl": 1,
+        "turn": 6
+    }
+}
