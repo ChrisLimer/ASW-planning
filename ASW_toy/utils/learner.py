@@ -55,15 +55,15 @@ def make_train(config_, env, network, optimizer):
 
                 prior_sub_distribution = env_state.sub_distribution.copy()
 
-                (logits, v, v_map) = network.apply(params, last_obs)
+                # (logits, v, v_map) = network.apply(params, last_obs)
+                # sub_logit = logits[:, :13, :]
+                # dip_logit = logits[:, 13, :]
+                (sub_logit, dip_logit, v, v_map) = network.apply(params, last_obs)
 
                 # sub_policy, sampled_sub_policy, sv_policy = env.mask_logit_to_policy(env_state, logits)
                 dip_mask = env.available_sv_dips[jnp.maximum(env_state.turn//2-1, 0)] # (N, 3,13) --> (N, 13)
 
-                sub_logit = logits[:, :13, :]
-                dip_logit = logits[:, 13, :]
-
-                print(f"logits: {logits.shape}")
+                # print(f"logits: {logits.shape}")
                 print(f"sub_logit: {sub_logit.shape}")
                 print(f"dip_logit: {dip_logit.shape}")
                 # sub_policy, sampled_sub_policy, sv_policy = env.mask_logit_to_policy(logits, env_state.sub_pos_samples, dip_mask)
@@ -123,8 +123,9 @@ def make_train(config_, env, network, optimizer):
             print(f"transition.r: {transition.r.shape}")
             print(f"transition.r_i: {transition.r_i.shape}")
             init_carry = (jnp.zeros_like(transition.r[0]), jnp.zeros_like(transition.r_i[0]))
-            _, R = jax.lax.scan(compute_advantage, init_carry, transition, reverse=True, unroll=16)
+            final_carry, R = jax.lax.scan(compute_advantage, init_carry, transition, reverse=True, unroll=16)
             (R_tT, R_tTi, r, r_i) = R
+            (R_tT_, R_tTi_) = final_carry
 
             print(f"R_tT: {R_tT.shape}")
             print(f"R_tTi: {R_tTi.shape}")
@@ -160,23 +161,25 @@ def make_train(config_, env, network, optimizer):
                         player1_mask = jnp.logical_and(jnp.logical_not(transition.done2), (transition.player==1))
                         
                         print(f"Apply params")
-                        (logits, v, v_map) = network.apply(params, transition.obs)
-
-                        sub_logit = logits[:, :13, :]
-                        dip_logit = logits[:, 13, :]
+                        # (logits, v, v_map) = network.apply(params, transition.obs)
+                        # sub_logit = logits[:, :13, :]
+                        # dip_logit = logits[:, 13, :]
+                        (sub_logit, dip_logit, v, v_map) = network.apply(params, transition.obs)
 
                         print(f"mask_logit_to_policy")
                         pi_sub_policy, pi_sampled_sub_policy, pi_sv_policy = env.mask_logit_to_policy(sub_logit, dip_logit, transition.sub_pos_samples, dip_mask)
 
                         ##
                         #### Regularization for regularized objective loss
-                        (logits_reg1, v_reg1, v_map_reg1) = network.apply(model_reg_params_t1, transition.obs)
-                        (logits_reg2, v_reg2, v_map_reg2) = network.apply(model_reg_params_t2, transition.obs)
+                        # (logits_reg1, v_reg1, v_map_reg1) = network.apply(model_reg_params_t1, transition.obs)
+                        # (logits_reg2, v_reg2, v_map_reg2) = network.apply(model_reg_params_t2, transition.obs)
+                        (sub_logit_reg1, dip_logit_reg1, v, v_map) = network.apply(params, transition.obs)
+                        (sub_logit_reg2, dip_logit_reg2, v, v_map) = network.apply(params, transition.obs)
 
-                        sub_logit_reg1 = logits_reg1[:, :13, :]
-                        dip_logit_reg1 = logits_reg1[:, 13, :]
-                        sub_logit_reg2 = logits_reg2[:, :13, :]
-                        dip_logit_reg2 = logits_reg2[:, 13, :]
+                        # sub_logit_reg1 = logits_reg1[:, :13, :]
+                        # dip_logit_reg1 = logits_reg1[:, 13, :]
+                        # sub_logit_reg2 = logits_reg2[:, :13, :]
+                        # dip_logit_reg2 = logits_reg2[:, 13, :]
                         print(f"sub_logit_reg1: {sub_logit_reg1.shape}")
                         print(f"dip_logit_reg1: {dip_logit_reg1.shape}")
 
@@ -246,7 +249,7 @@ def make_train(config_, env, network, optimizer):
 
                         #### Reward Advantage and policy gradients
                         (R_tT, R_tTi, r, r_i) = targets
-                        batch_idx = jnp.arange(logits.shape[0])
+                        batch_idx = jnp.arange(dip_logit.shape[0])
                         sub_batch_idx = jnp.arange(sub_pos_samples.shape[1])
 
                         ## get pi(a_i) and mu(a_i)
@@ -304,7 +307,7 @@ def make_train(config_, env, network, optimizer):
                         #### PPO-similar policy loss
                         #### Submarine policy loss
                         print(f"PPO-similar policy loss")
-                        sub_ratio_samples = jnp.where(player0_i_mask, pi_sampled_sub_p / mu_sampled_sub_p, 0.0)
+                        sub_ratio_samples = jnp.where(player0_i_mask, pi_sampled_sub_p / (mu_sampled_sub_p+1e-14), 0.0)
                         # sub_ratio_samples = jnp.where(player0_i_mask, pi_sampled_sub_p / pi_sampled_sub_p_reg, 0.0)
 
                         Adv_sub_samples_clip_1 = Adv_sub_samples * sub_ratio_samples
@@ -327,7 +330,7 @@ def make_train(config_, env, network, optimizer):
                         print(f"    pi_sv_p_reg: {pi_sv_p_reg.shape}")
                         print(f"    sub_ratio_samples: {sub_ratio_samples.shape}")
                         print(f"    Adv_sv: {Adv_sv.shape}")
-                        sv_ratio = jnp.where(player1_mask, pi_sv_p / mu_sv_p, 0.0)
+                        sv_ratio = jnp.where(player1_mask, pi_sv_p / (mu_sv_p+1e-14), 0.0)
                         # sv_ratio = jnp.where(player1_mask, pi_sv_p / pi_sv_p_reg, 0.0)
                         print(f"    sv_ratio: {sv_ratio.shape}")
 
@@ -346,10 +349,14 @@ def make_train(config_, env, network, optimizer):
 
 
                         ## Entropy loss
-                        sub_i_entropy = -jnp.sum(pi_sampled_sub_policy * jnp.log(pi_sampled_sub_policy+1e-15),  axis=(-1), where=policy_mask_sub_i)    # (N, n, D) -> (N, n)        Sum over D -> (-1)
+                        print(f"Learning\n\n\n pi_sampled_sub_policy: {pi_sampled_sub_policy.shape}")
+                        print(f"pi_sv_policy: {pi_sv_policy.shape}")
+
+                        sub_i_entropy = -jnp.sum(pi_sampled_sub_policy * jnp.log(pi_sampled_sub_policy+1e-15),  axis=(-1), where=policy_mask_sub_i)    # (N, n, N_D) -> (N, n)        Sum over D -> (-1)
                         sub_i_entropy_loss_mean = -jnp.mean(sub_i_entropy*transition.p_i_prior, where=player0_i_mask )        # (N, n) -> (,)
 
-                        sv_entropy = -jnp.sum( (jnp.log(pi_sv_policy+1e-14)*pi_sv_policy), where=policy_mask_sv, axis=(-1,-2))      # normal entropy loss: (N, N_y, N_x) --> (N)
+                        sv_entropy = -jnp.sum( (jnp.log(pi_sv_policy+1e-14)*pi_sv_policy), where=policy_mask_sv, axis=(-1))      # normal entropy loss: (N, N_D) --> (N)
+                        print(f"Learning\n\n\n sv_entropy: {sv_entropy.shape}\n\n\n")
                         sv_entropy_loss_mean = -jnp.mean(sv_entropy*transition.p_prior, where=player1_mask)                         # (N) --> (,)
 
 
@@ -374,7 +381,8 @@ def make_train(config_, env, network, optimizer):
                         print(f"Return losses")
                         # return loss, (loss_v, loss_vi, loss_actor_sub, loss_actor_sv, loss_kl_divergence, pi_sampled_sub_policy, mu_sampled_sub_policy, pi_sampled_sub_p, mu_sampled_sub_p)
                         # return loss, (loss_v, loss_vi, loss_actor_sub, loss_actor_sv, loss_kl_sub, loss_kl_sub_i, loss_kl_sv, pi_sampled_sub_policy, mu_sampled_sub_policy, pi_sampled_sub_p, mu_sampled_sub_p)
-                        return loss, (loss_v, loss_vi, loss_actor_sub, loss_actor_sv, loss_kl_sub, loss_kl_sub_i, loss_kl_sv, jnp.max(KL_distance_sub), jnp.max(KL_distance_sub_i), jnp.max(KL_distance_sv), pi_sampled_sub_policy, mu_sampled_sub_policy, pi_sampled_sub_p, mu_sampled_sub_p)
+                        # return loss, (loss_v, loss_vi, loss_actor_sub, loss_actor_sv, loss_kl_sub, loss_kl_sub_i, loss_kl_sv, jnp.max(KL_distance_sub), jnp.max(KL_distance_sub_i), jnp.max(KL_distance_sv), pi_sampled_sub_policy, mu_sampled_sub_policy, pi_sampled_sub_p, mu_sampled_sub_p)
+                        return loss, (loss_v, loss_vi, loss_actor_sub, loss_actor_sv, loss_kl_sub, loss_kl_sub_i, loss_kl_sv, sub_i_entropy_loss_mean, sv_entropy_loss_mean)
                     
 
 
@@ -397,6 +405,7 @@ def make_train(config_, env, network, optimizer):
                     # linear_fit_params(model_params)
                     params_target = jax.tree_util.tree_map(lambda p2, p1: (1.0 - gamma_averaging) * p2 + gamma_averaging * p1, params_target, model_params)
 
+                    print(f"    _update_minbatch losses: {len(losses)}")
                     return (model_params, params_target, optimizer_state), (losses, max_grad_magnitude)
                 ## _update_minbatch
 
@@ -460,9 +469,12 @@ def make_train(config_, env, network, optimizer):
 
                 update_state = (model_params, params_target, optimizer_state, transition, targets, rng)
 
-                
+                print(f"    _update_epoch losses: {len(losses)}")
+                print(f"    _update_epoch losses: {type(losses[1])}")
+                print(f"    _update_epoch losses: {len(losses[1])}")
 
-                losses_ = (losses[0], *losses[1], grad)
+                # losses_ = (losses[0], *losses[1], grad)
+                losses_ = (losses[0], *losses[1])
                 
 
                 print(f"_update_epoch Done!")
@@ -481,13 +493,31 @@ def make_train(config_, env, network, optimizer):
             optimizer_state = update_state[2]
             rng = update_state[5]
 
+
+
+            R_mean = jnp.mean(R_tT_)
+            R_vec = jnp.array([ jnp.min(R_tT_, initial=2.0),
+                                jnp.mean(R_tT_, where=R_tT_<R_mean),
+                                R_mean,
+                                jnp.mean(R_tT_, where=R_tT_>=R_mean),
+                                jnp.max(R_tT_, initial=-2.0)])
+            R_i_mean = jnp.mean(R_tTi_)
+            R_i_vec = jnp.array([ jnp.min(R_tTi_, initial=2.0),
+                                    jnp.mean(R_tTi_, where=R_tTi_<R_i_mean),
+                                    R_i_mean,
+                                    jnp.mean(R_tTi_, where=R_tTi_>=R_i_mean),
+                                    jnp.max(R_tTi_, initial=-2.0)])
+            
+            metric_outcome = (R_vec, R_i_vec)
             # metric = (losses, transition, targets)
-            metric = losses
+
+            print(f"    _update_step losses: {len(losses)}")
+            metric_losses = losses
 
             # runner_state = (model_params, optimizer_state, env_state, last_obs, rng)
             runner_state_update_step = (model_params, params_target, optimizer_state, rng, update_step+1)
-            return runner_state_update_step, metric
-        
+            return runner_state_update_step, (metric_losses, metric_outcome)
+        ## _update_step
         
 
         # rng, _rng = jax.random.split(rng)
@@ -501,10 +531,10 @@ def make_train(config_, env, network, optimizer):
 
         print(f"\n_update_step...")
         # runner_state, metric = jax.lax.scan( _update_step, runner_state, None, config_["NUM_UPDATES"] )
-        runner_state, metric = jax.lax.scan( _update_step, runner_state, None, config_["N_JIT_STEPS"] )
+        runner_state, (metric_losses, metric_outcome) = jax.lax.scan( _update_step, runner_state, None, config_["N_JIT_STEPS"] )
         
 
 
-        return {"runner_state": runner_state, "metrics": metric}
+        return {"runner_state": runner_state, "metric_losses": metric_losses, "metric_outcome": metric_outcome}
 
     return train

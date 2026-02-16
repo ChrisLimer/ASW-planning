@@ -19,6 +19,7 @@ import flax.linen as nn
 import optax
 import time
 from pathlib import Path
+from tensorboardX import SummaryWriter
 
 import argparse
 
@@ -41,7 +42,7 @@ from learner import make_train
 from asw_toy_env import SubState, Transition, Target, SubEnv
 from ActorCriticNetwork import MLP
 from to_tabular_policy_utils import ComputeJaxPolicy
-from train_utils import create_config, save_model, save_model_and_optimizer, load_model, load_model_and_optimizer
+from train_utils import create_config, save_model, save_model_and_optimizer, load_model, load_model_and_optimizer, log_metrics
 
 def main(args):
 
@@ -75,12 +76,14 @@ def main(args):
 
     opt_state = optimizer.init(model_params)
 
+    log_path = args.save_path + "/log/"
+    writer = SummaryWriter(log_dir=log_path)
     train_jit = jax.jit(make_train(config, env, network, optimizer))
 
 
     ## save a .txt file with all checkpoints 
     stored_checkpoint_indices = []
-    for i in range(args.N_train_steps):
+    for i in range(args.N_train_steps+1):
         if (i%args.cpt_freq==0) or i in [2, 4, 8, 16, 32]:
             stored_checkpoint_indices.append(int(i))
 
@@ -149,9 +152,14 @@ def main(args):
 
             config['current_reg_step'] = current_reg_step
 
-            metrics = out['metrics']
+            # metrics = out['metrics']
             # (losses, transition, targets) = metrics
-            losses = metrics
+            # {"runner_state": runner_state, "metric_losses": metric_losses, "metric_outcome": metric_outcome}
+            metric_losses = out['metric_losses']
+            metric_outcome = out['metric_outcome']
+            # log_metrics(writer, i, config, args, metric_outcome, metric_losses, metric_clip_norm_ratio)    # function to log training progress to 'writer'
+            log_metrics(writer, i, config, args, metric_outcome, metric_losses)    # function to log training progress to 'writer'
+
 
 
             if i==0:
@@ -166,7 +174,7 @@ def main(args):
                 save_model_and_optimizer(trained_params, opt_state, args.save_path + "/searcher_model/searcher_model_params", i)
                 # save_model_and_optimizer(trained_params, opt_state, save_checkpoints_path, i)
                 # save_model_and_optimizer(params_target_new, opt_state, save_checkpoints_path, i)
-            if i%512==0:
+            if i%512==0 or i>=args.N_train_steps:
                 key, key_ = jax.random.split(key)
                 recent_checkpoint_to_tabular_policy_ = ComputeJaxPolicy(network, env, key_, stored_checkpoint_indices, args.save_path + "/target_model/target_model_params", args.save_path + "/target_model", game_state_dict, recent_checkpoint_to_tabular_policy)
 
@@ -193,8 +201,8 @@ if __name__ == "__main__":
     parser.add_argument('--lr', type=float, nargs='?',  const=0.0001, default=0.0001, help="learning rate")
     parser.add_argument('--N_JIT_STEPS', type=int, nargs='?',  const=64, default=64, help="number of compiled update-steps each python step/loop")
     parser.add_argument('--N_train_steps', type=int, nargs='?',  const=512+1, default=512+1, help="Number training steps")
-    parser.add_argument('--num_minibatches', type=int, nargs='?',  const=512+1, default=512+1, help="Number of minibatches to split up training iterations in")
-    parser.add_argument('--num_epochs', type=int, nargs='?',  const=512+1, default=512+1, help="Number of epochs for each transition")
+    parser.add_argument('--num_minibatches', type=int, nargs='?',  const=1, default=1, help="Number of minibatches to split up training iterations in")
+    parser.add_argument('--num_epochs', type=int, nargs='?',  const=1, default=1, help="Number of epochs for each transition")
 
     parser.add_argument('--max_grad_norm', type=float, nargs='?',  const=0.5, default=0.5, help="Max grad norm. {0.1: Low and stable}, {1.0: standard PPO}, {5.0+: usually unstable in RL}")
     parser.add_argument('--clip_eps', type=float, nargs='?',  const=0.2, default=0.2, help="PPO clipping surrogate objective. {0.1: low and stable but slow}, {0.2: standard PPO}, {0.3: High and unstable}")
@@ -206,8 +214,8 @@ if __name__ == "__main__":
     parser.add_argument('--sub_ent_loss', type=float, nargs='?',  const=0.001, default=0.001, help="Submarine entropy loss")
 
 
-    # parser.add_argument('--train_model', type=bool, nargs='?',  const=False, default=False, help="Train model parameters or it is already done")
-    parser.add_argument('--train_model', action='store_true', help="Train model parameters or it is already done")
+    parser.add_argument('--train_model', type=bool, nargs='?',  const=False, default=False, help="Train model parameters or it is already done")
+    # parser.add_argument('--train_model', action='store_true', help="Train model parameters or it is already done")
 
     parser.add_argument('--reg_freq', type=int, nargs='?',  const=128, default=128, help="Number training steps")
     parser.add_argument('--cpt_freq', type=int, nargs='?',  const=64, default=64, help="Number training steps")
@@ -235,3 +243,5 @@ if __name__ == "__main__":
     print(f"\n")
 
     main(args)
+
+# uv run Train_asw_toy.py --save_path "./ASW_toy/checkpoints/train_2026_02_16" --N 512 --n 256 --lr 0.00001 --N_JIT_STEPS 32 --N_train_steps 256 --alpha_kl 0.01 --gamma_averaging 0.001 --train_model True --N_JIT_STEPS 16 --num_minibatches 1 --num_epochs 1 --max_grad_norm 0.5 --clip_eps 0.2 --reg_freq 64 --cpt_freq 4

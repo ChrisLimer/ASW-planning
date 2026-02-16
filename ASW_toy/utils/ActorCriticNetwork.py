@@ -31,15 +31,22 @@ class MLP(nn.Module):
 
 
     def setup(self):
-        self.linear_policy_1 = nn.Dense(features=self.hidden_dim)
-        self.linear_policy_2 = nn.Dense(features=self.hidden_dim)
-        self.linear_policy_3 = nn.Dense(features=14 * 13)
+
+        self.linear_policy_pl1_1 = nn.Dense(features=self.hidden_dim)
+        self.linear_policy_pl1_2 = nn.Dense(features=self.hidden_dim)
+        self.linear_policy_pl1_3 = nn.Dense(features=13 * 13)
+
+        self.linear_policy_pl2_1 = nn.Dense(features=self.hidden_dim)
+        self.linear_policy_pl2_2 = nn.Dense(features=self.hidden_dim)
+        self.linear_policy_pl2_3 = nn.Dense(features=1 * 13)
 
         self.linear_value_1 = nn.Dense(features=self.hidden_dim)
-        self.linear_value_2 = nn.Dense(features=1)
+        self.linear_value_2 = nn.Dense(features=self.hidden_dim)
+        self.linear_value_3 = nn.Dense(features=1)
 
         self.linear_value_map_1 = nn.Dense(features=self.hidden_dim)
-        self.linear_value_map_2 = nn.Dense(features=13)
+        self.linear_value_map_2 = nn.Dense(features=self.hidden_dim)
+        self.linear_value_map_3 = nn.Dense(features=13)
 
 
 
@@ -52,31 +59,29 @@ class MLP(nn.Module):
         x = x.reshape((N, -1))
 
         # MLP layers
-        # x = nn.Dense(self.hidden_dim)(x)
-        p = self.linear_policy_1(x)
-        p = nn.relu(p)
-        # x = nn.Dense(self.hidden_dim)(x)
-        p = self.linear_policy_2(p)
-        p = nn.relu(p)
+        p_pl1 = self.linear_policy_pl1_1(x)
+        p_pl1 = nn.relu(p_pl1)
+        p_pl1 = self.linear_policy_pl1_2(p_pl1)
+        p_pl1 = nn.relu(p_pl1)
+        p_pl1 = self.linear_policy_pl1_3(p_pl1)     # Final output: (N, 14*13)
+        logits_pl1 = p_pl1.reshape((N, 13, 13))
 
-        # Final output: (N, 14*13)
-        # x = nn.Dense(14 * 13)(x)
-        p = self.linear_policy_3(p)
-
-        # Reshape to (N, 14, 13)
-        logits = p.reshape((N, 14, 13))
+        p_pl2 = self.linear_policy_pl2_1(x)
+        p_pl2 = nn.relu(p_pl2)
+        p_pl2 = self.linear_policy_pl2_2(p_pl2)
+        p_pl2 = nn.relu(p_pl2)
+        p_pl2 = self.linear_policy_pl2_3(p_pl2)     # Final output: (N, 14*13)
+        logits_pl2 = p_pl2.reshape((N, 13))
 
         # value = nn.Dense(1)(x)       # shape (N, 1)
         v = self.linear_value_1(x)
         v = self.linear_value_2(v)
+        v = self.linear_value_3(v)
         value = v.squeeze(-1)    # shape (N,)
 
         v_map = self.linear_value_map_1(x)
         v_map = self.linear_value_map_2(v_map)
+        v_map = self.linear_value_map_3(v_map)
 
-
-        # logits *= 0.0   # fixed uniform policy
-        # logits = logits.at[:,13,:].set(0.0) # fixed uniform dip policy
-        # logits = logits.at[:,:13,:].set(0.0) # fixed uniform sub policy
-        # v_map *= 0.0
-        return logits, value, v_map
+        return logits_pl1, logits_pl2, value, v_map
+    

@@ -112,15 +112,16 @@ def GoThroughAllStates(action_history, turn_bool, env_state, key, model_params, 
 
         # action_hist = unused
         sub_pos_samples = jnp.array(env_state.sub_pos_samples)
-        (logits, v, v_map) = network.apply(model_params, obs)
+        # (logits, v, v_map) = network.apply(model_params, obs)
+        # sub_logit = logits[:, :13, :]
+        # dip_logit = logits[:, 13, :]
+        (sub_logit, dip_logit, v, v_map) = network.apply(model_params, obs)
         dip_mask = env.available_sv_dips[jnp.maximum(env_state.turn//2-1, 0)] # (N, 3,13) --> (N, 13)
 
         # print(f"env_state.sub_pos_samples.dtype: {env_state.sub_pos_samples.dtype}")
         # jax.debug.print("env_state.sub_pos_samples.dtype: {}", env_state.sub_pos_samples.dtype)
         # jax.debug.print("env_state.sub_pos_samples.: {}\n{}", env_state.sub_pos_samples.shape, env_state.sub_pos_samples)
 
-        sub_logit = logits[:, :13, :]
-        dip_logit = logits[:, 13, :]
         sub_policy, sampled_sub_policy, sv_policy = env.mask_logit_to_policy(sub_logit, dip_logit, env_state.sub_pos_samples, dip_mask) # env_step
         rng, _rng = jax.random.split(rng)
         action_sub_samples, action_dip = env.sample_action(_rng, sv_policy, sampled_sub_policy)
@@ -169,11 +170,10 @@ def GoThroughAllStates(action_history, turn_bool, env_state, key, model_params, 
     (env_state, key) = runner_state
 
     obs = env.get_obs(env_state)
-    (logits, v, v_map) = network.apply(model_params, obs)
+    # (logits, v, v_map) = network.apply(model_params, obs)
+    (sub_logit, dip_logit, v, v_map) = network.apply(model_params, obs)
     dip_mask = env.available_sv_dips[jnp.maximum(env_state.turn//2-1, 0)] # (N, 3,13) --> (N, 13)
 
-    sub_logit = logits[:, :13, :]
-    dip_logit = logits[:, 13, :]
     sub_policy, sampled_sub_policy, sv_policy = env.mask_logit_to_policy(sub_logit, dip_logit, env_state.sub_pos_samples, dip_mask) # end state
     
     sub_policy = sub_policy.astype(jnp.float64)

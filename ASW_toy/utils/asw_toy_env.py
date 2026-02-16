@@ -265,8 +265,8 @@ class SubEnv(nn.Module):
             ps1 = state.sub_distribution[:, 10]
             ps2 = state.sub_distribution[:, 11]
             ps3 = state.sub_distribution[:, 12]
-            rs = ps1 + ps2*2 + ps3
-            ps = ps1 + ps2 + ps3
+            rs = ps1*1.0 + ps2*2.0 + ps3*1.0
+            ps = ps1*1.0 + ps2*1.0 + ps3*1.0
             # state.sub_distribution = state.sub_distribution.at[:, (9, 10, 11)].set(0.0) # Set the probability of the sub at (9, 10, 11) to 0.0%
             
 

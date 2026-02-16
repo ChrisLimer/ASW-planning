@@ -67,6 +67,39 @@ def create_config(args):
     
     return config
 
+def create_config_(N, n):
+    config = {}
+
+    config['NUM_ENVS'] = N
+    config['NUM_SUB_ENVS'] = n
+    config['NUM_STEPS'] = 8
+    # config['LR'] = 0.00001  # _lr0_00001
+    config['LR'] = 0.00001
+
+    config['MAX_GRAD_NORM'] = 0.5
+    config["CLIP_EPS"] = 0.2
+    config["NUM_EPOCHS"] = 1
+
+    config["N_JIT_STEPS"] = 1
+    config["TOTAL_TIMESTEPS"] = config["N_JIT_STEPS"] * config["NUM_STEPS"] * config["NUM_ENVS"]
+
+    if config["NUM_ENVS"]>8:
+        config["NUM_MINIBATCHES"] = 1
+    else:
+        config["NUM_MINIBATCHES"] = 1
+
+    config["MINIBATCH_SIZE"] = (config["NUM_ENVS"] * config["NUM_STEPS"] // config["NUM_MINIBATCHES"])
+
+    config['current_reg_step'] = 0
+    config['max_reg_step'] = config['N_JIT_STEPS'] * 32
+    config['alpha_kl'] = 0.01
+    config['gamma_averaging'] = 0.001
+
+    config['SUB_ENT_LOSS'] = 0.01
+    config['SV_ENT_LOSS'] = 0.01
+    
+    return config
+
 
 ####
 #### Functions to save and load the model and optimizer
@@ -164,3 +197,34 @@ def load_all_params_from_checkpoints(model: nn.Module, key, checkpoint_dir: str)
             param_list.append(params)
 
     return param_list
+
+
+
+def log_metrics(writer, i, config, args, metric_outcome, metric_losses):
+    # log_metrics(writer, i, config, args, metric_outcome, metric_losses)
+
+    (R_vec, R_i_vec) = metric_outcome
+    # print(f"metric_losses: {len(metric_losses)}")
+    (total_loss, loss_v, loss_vi, loss_actor_sub, loss_actor_sv, loss_kl_sub, loss_kl_sub_i, loss_kl_sv, sub_i_entropy_loss_mean, sv_entropy_loss_mean) = metric_losses
+    writer.add_scalars(main_tag="Trajectory outcomes/R_tT",
+        tag_scalar_dict={
+            "min(R_tT) ":  jnp.mean(R_vec[:,0]) ,
+            "mean(R_tT<mean) ":  jnp.mean(R_vec[:,1]) ,
+            "mean(R_tT) ":  jnp.mean(R_vec[:,2]) ,
+            "mean(R_tT>=mean) ":  jnp.mean(R_vec[:,3]) ,
+            "max(R_tT) ":  jnp.mean(R_vec[:,4]) ,
+        }, global_step=i)
+    
+
+    writer.add_scalars( main_tag="Loss/loss_actor_sub", tag_scalar_dict={"loss_actor_sub": jnp.mean(loss_actor_sub) }, global_step=i)
+    writer.add_scalars( main_tag="Loss/loss_actor_sv", tag_scalar_dict={"loss_actor_sv": jnp.mean(loss_actor_sv) }, global_step=i)
+
+    writer.add_scalars( main_tag="Loss/loss_kl_sub_i", tag_scalar_dict={"loss_kl_sub_i": jnp.mean(loss_kl_sub_i) }, global_step=i)
+    writer.add_scalars( main_tag="Loss/loss_kl_sv", tag_scalar_dict={"loss_kl_sv": jnp.mean(loss_kl_sv) }, global_step=i)
+    writer.add_scalars( main_tag="Loss/sub_i_entropy_loss_mean", tag_scalar_dict={"sub_i_entropy_loss_mean": jnp.mean(sub_i_entropy_loss_mean) }, global_step=i)
+    writer.add_scalars( main_tag="Loss/sv_entropy_loss_mean", tag_scalar_dict={"sv_entropy_loss_mean": jnp.mean(sv_entropy_loss_mean) }, global_step=i)
+
+    writer.add_scalars( main_tag="Loss/loss_v", tag_scalar_dict={"loss_v": jnp.mean(loss_v) }, global_step=i)
+    writer.add_scalars( main_tag="Loss/loss_vi", tag_scalar_dict={"loss_vi": jnp.mean(loss_vi) }, global_step=i)
+
+    return
