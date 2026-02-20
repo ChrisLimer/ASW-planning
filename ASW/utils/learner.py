@@ -145,7 +145,7 @@ def make_train(config_, env, network, optimizer):
                     (transition, targets) = batch_info
                     (model_params, params_target, optimizer_state) = model_opt_sate
 
-                    def _loss_fn_r_nad(params, transition, targets):
+                    def _loss_fn(params, transition, targets):
                         sub_pos_samples = transition.sub_pos_samples
                         dip_mask = transition.dip_mask
 
@@ -364,10 +364,10 @@ def make_train(config_, env, network, optimizer):
                                     #   sv_ratio_high, sv_ratio_low, sub_ratio_samples_high, sub_ratio_samples_low )
 
                         # sv_ratio_high, sv_ratio_low, sub_ratio_samples_high, sub_ratio_samples_low
-                    ## _loss_fn_r_nad
+                    ## _loss_fn
 
 
-                    grad_rnad_fn = jax.value_and_grad(_loss_fn_r_nad, has_aux=True)
+                    grad_rnad_fn = jax.value_and_grad(_loss_fn, has_aux=True)
 
                     losses, grads = grad_rnad_fn(model_params, transition, targets)
 
