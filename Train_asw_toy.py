@@ -42,7 +42,7 @@ from learner import make_train
 from asw_toy_env import SubState, Transition, Target, SubEnv
 from ActorCriticNetwork import MLP
 from to_tabular_policy_utils import ComputeJaxPolicy
-from train_utils import create_config, save_model, save_model_and_optimizer, load_model, load_model_and_optimizer, log_metrics
+from train_utils import create_config, save_model, save_model_and_optimizer, load_model, load_model_and_optimizer, log_metrics, make_lr_scheduler
 
 def main(args):
 
@@ -71,6 +71,11 @@ def main(args):
     reg_params_0 = network.init(_rng, dummy_input)
 
 
+
+
+    # learning_rate_schedule = make_lr_scheduler(config["LR"], 32768*4)
+    # optimizer = optax.chain(   optax.clip_by_global_norm(config["MAX_GRAD_NORM"]),
+                        # optax.adam(learning_rate=learning_rate_schedule, eps=1e-5))
     optimizer = optax.chain(   optax.clip_by_global_norm(config["MAX_GRAD_NORM"]),
                         optax.adam(learning_rate=config["LR"], eps=1e-5))
 
@@ -122,7 +127,9 @@ def main(args):
     with open(f"./ASW_toy/utils/game_state.json", "r") as f:
         game_state_dict = json.load(f)
 
+    print(f"args.train_model: {type(args.train_model)}   {args.train_model}")
     if (args.train_model):
+        
         time_training_start = time.time()
         time_start = time.time()
         # save_model_and_optimizer(model_params, opt_state, save_checkpoints_path, 0)
@@ -152,6 +159,8 @@ def main(args):
 
             config['current_reg_step'] = current_reg_step
 
+            # print(f"i: {i:4} opt_state[1][0].count: {opt_state[1][0].count}")
+
             # metrics = out['metrics']
             # (losses, transition, targets) = metrics
             # {"runner_state": runner_state, "metric_losses": metric_losses, "metric_outcome": metric_outcome}
@@ -162,32 +171,36 @@ def main(args):
 
 
 
-            if i==0:
+            if i<=1:
                 time_start = time.time()
 
             # if (i%args.cpt_freq==0 and i>0) or i in [2, 4, 8, 16, 32]:
             if (i%args.cpt_freq==0 or (i in stored_checkpoint_indices)) and i>0:
                 time_end = time.time()
                 print(f"training-step: {i}/{args.N_train_steps}    time: {int(time_end-time_start)} / {int( (time_end-time_start)*args.N_train_steps/i) } s   current_reg_step: {current_reg_step}/{config['max_reg_step']}")
-                
+                opt_step = int(opt_state[1][0].count)
+                # lr = learning_rate_schedule(opt_step)
+                # print(f"    i: {i:4} opt_state[1][0].count: {opt_state[1][0].count}  lr: {lr}")
+            
                 save_model(params_target_new, args.save_path + "/target_model/target_model_params", i)
                 save_model_and_optimizer(trained_params, opt_state, args.save_path + "/searcher_model/searcher_model_params", i)
                 # save_model_and_optimizer(trained_params, opt_state, save_checkpoints_path, i)
                 # save_model_and_optimizer(params_target_new, opt_state, save_checkpoints_path, i)
-            if i%512==0 or i>=args.N_train_steps:
+            if (i%args.convert_to_json_policy_freq==0 or i>=args.N_train_steps) and i>0:
                 key, key_ = jax.random.split(key)
                 recent_checkpoint_to_tabular_policy_ = ComputeJaxPolicy(network, env, key_, stored_checkpoint_indices, args.save_path + "/target_model/target_model_params", args.save_path + "/target_model", game_state_dict, recent_checkpoint_to_tabular_policy)
 
                 key, key_ = jax.random.split(key)
                 recent_checkpoint_to_tabular_policy = ComputeJaxPolicy(network, env, key_, stored_checkpoint_indices, args.save_path + "/searcher_model/searcher_model_params", args.save_path + "/searcher_model", game_state_dict, recent_checkpoint_to_tabular_policy)
                 print(f"New 'recent_checkpoint_to_tabular_policy': {recent_checkpoint_to_tabular_policy}")
-    else:
-        key, key_ = jax.random.split(key)
-        recent_checkpoint_to_tabular_policy_ = ComputeJaxPolicy(network, env, key_, stored_checkpoint_indices, args.save_path + "/target_model/target_model_params", args.save_path + "/target_model", game_state_dict, recent_checkpoint_to_tabular_policy)
 
-        key, key_ = jax.random.split(key)
-        recent_checkpoint_to_tabular_policy = ComputeJaxPolicy(network, env, key_, stored_checkpoint_indices, args.save_path + "/searcher_model/searcher_model_params", args.save_path + "/searcher_model", game_state_dict, recent_checkpoint_to_tabular_policy)
 
+    key, key_ = jax.random.split(key)
+    recent_checkpoint_to_tabular_policy_ = ComputeJaxPolicy(network, env, key_, stored_checkpoint_indices, args.save_path + "/target_model/target_model_params", args.save_path + "/target_model", game_state_dict, recent_checkpoint_to_tabular_policy)
+
+    key, key_ = jax.random.split(key)
+    recent_checkpoint_to_tabular_policy = ComputeJaxPolicy(network, env, key_, stored_checkpoint_indices, args.save_path + "/searcher_model/searcher_model_params", args.save_path + "/searcher_model", game_state_dict, recent_checkpoint_to_tabular_policy)
+    print(f"New 'recent_checkpoint_to_tabular_policy': {recent_checkpoint_to_tabular_policy}")
 
 ## uv run asw_jax_train.py --save_path "~dev/AIBLS/asw-planning-foi/ASW_Pub_AMG/retrain_2025_10_28" --N 64 --n 2048 --lr 0.001 --N_JIT_STEPS 32 --N_steps 32768 --alpha_kl 0.1 --gamma_averaging 0.001 --train_model
 if __name__ == "__main__":
@@ -213,28 +226,11 @@ if __name__ == "__main__":
     parser.add_argument('--sv_ent_loss', type=float, nargs='?',  const=0.001, default=0.001, help="Surface vehicle entropy loss")
     parser.add_argument('--sub_ent_loss', type=float, nargs='?',  const=0.001, default=0.001, help="Submarine entropy loss")
 
+    parser.add_argument('--train_model', action='store_true', help="Train the model if flag is provided.")
 
-    parser.add_argument('--train_model', type=bool, nargs='?',  const=False, default=False, help="Train model parameters or it is already done")
-    # parser.add_argument('--train_model', action='store_true', help="Train model parameters or it is already done")
-
-    parser.add_argument('--reg_freq', type=int, nargs='?',  const=128, default=128, help="Number training steps")
-    parser.add_argument('--cpt_freq', type=int, nargs='?',  const=64, default=64, help="Number training steps")
-
-    
-
-
-    # parser.add_argument('--AC_COEF', type=float, help="Actor loss")
-    # parser.add_argument('--NUM_ENVS', type=int, help="Number of parallel environments")
-    # parser.add_argument('--N_steps', type=int, help="Number training steps")
-    # parser.add_argument('--N_y', type=int, help="board height")
-    # parser.add_argument('--N_x', type=int, help="board width")
-
-    # parser.add_argument('--N_JIT_STEPS', type=int, help="number of compiled update-steps each python step/loop")
-    # parser.add_argument('--lr', type=float, help="learning rate")
-    # parser.add_argument('--cpt_freq', type=int, help="Checkpoint frequency")
-    # parser.add_argument('--layer_width', type=int, help="network layer width")
-    
-    # parser.add_argument('--resume_with_new_settings', type=bool, help='if resuming, change some parameters e.g., learning-rates, batch-size, etc. ')
+    parser.add_argument('--reg_freq', type=int, nargs='?',  const=128, default=128, help="Regularization frequency (in outer steps 'i')")
+    parser.add_argument('--cpt_freq', type=int, nargs='?',  const=64, default=64, help="Checkpoint frequency (in outer steps 'i')")
+    parser.add_argument('--convert_to_json_policy_freq', type=int, nargs='?',  const=512, default=512, help="Frequency to compute the json policies for all new checkpoints")
 
     args = parser.parse_args()
     print(f"Start training with parameters")
@@ -244,4 +240,4 @@ if __name__ == "__main__":
 
     main(args)
 
-# uv run Train_asw_toy.py --save_path "./ASW_toy/checkpoints/train_2026_02_16" --N 512 --n 256 --lr 0.00001 --N_JIT_STEPS 32 --N_train_steps 256 --alpha_kl 0.01 --gamma_averaging 0.001 --train_model True --N_JIT_STEPS 16 --num_minibatches 1 --num_epochs 1 --max_grad_norm 0.5 --clip_eps 0.2 --reg_freq 64 --cpt_freq 4
+# uv run Train_asw_toy.py --save_path "./ASW_toy/checkpoints/train_2026_02_16" --N 512 --n 256 --lr 0.00001 --N_JIT_STEPS 32 --N_train_steps 256 --alpha_kl 0.01 --gamma_averaging 0.001 --train_model --N_JIT_STEPS 16 --num_minibatches 1 --num_epochs 1 --max_grad_norm 0.5 --clip_eps 0.2 --reg_freq 64 --cpt_freq 4
