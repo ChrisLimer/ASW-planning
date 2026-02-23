@@ -228,3 +228,15 @@ def log_metrics(writer, i, config, args, metric_outcome, metric_losses):
     writer.add_scalars( main_tag="Loss/loss_vi", tag_scalar_dict={"loss_vi": jnp.mean(loss_vi) }, global_step=i)
 
     return
+
+
+
+def make_lr_scheduler(lr=0.00001, switch=524288):
+    def learning_rate_schedule(step):
+        # step =  step.astype(jnp.float32)
+        base_lr = lr        # 1e-5
+        switch_ = switch     # 524288
+        # constant until switch, then ~1/t but continuous
+        scale = jnp.maximum(step / switch_, 1.0)
+        return base_lr / scale
+    return learning_rate_schedule
